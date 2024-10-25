@@ -1,0 +1,73 @@
+#!/usr/bin/env perl
+#
+# Used to strip extra leading zeros and underscores, which may cause warnings
+# in VCS or Verdi, from verilog/systemverilog files.
+#
+# For example:
+#   2'd05 => 2'd5
+#   16'h0_0000 => 16'h0000
+
+use strict;
+use warnings;
+use POSIX ();
+
+my @files = `find $ARGV[0] -type f \\( -name "*.sv" -or -name "*.v" \\)`;
+
+chomp(@files);
+
+for my $file (@files) {
+    `mv $file $file.bak`;
+    open my $ifh, "<", "$file.bak" or die "Cannot open $file.bak for read\n";
+    open my $ofh, ">", "$file" or die "Cannot create $file for write\n";
+    while(my $line = <$ifh>) {
+        print $ofh &modify($line);
+    }
+    close($ifh);
+    close($ofh);
+    `rm $file.bak`;
+}
+
+sub modify {
+    my $line = shift;
+    $line =~ s/(\d+)'([bdh])([0-9a-fA-F_]+)/simplify($1, $2, $3)/eg;
+    return $line;
+}
+
+sub simplify {
+    my ($size, $type, $str) = @_;
+
+    if ($type eq "b") {
+        if (valid_length($str) > $size) {
+            $str =~ s/^0+//;
+            my $prefix = "0" x ($size - valid_length($str));
+            $str = $prefix . $str;
+        }
+        $str =~ s/^_+//;
+        return "$size'$type$str";
+    }
+    elsif ($type eq "d") {
+        if ((10 ** valid_length($str)) > (2 ** $size)) {
+            $str =~ s/^0+//;
+            while ((10 ** valid_length($str)) < (2 ** $size)) {
+                $str = "0" . $str;
+            }
+        }
+        $str =~ s/^_+//;
+        return "$size'$type$str";
+    }
+    elsif ($type eq "h") {
+        if ((valid_length($str) * 4) > $size) {
+            $str =~ s/^0+//;
+            my $prefix = "0" x (POSIZ::ceil($size / 4) -valid_length($str));
+            $str = $prefix . $str;
+        }
+        $str =~ s/^_+//;
+        return "$size'$type$str";
+    }
+}
+
+sub valid_length {
+    my $str = shift;
+    $str =~ s/_//g;
+    return length($str);
+}

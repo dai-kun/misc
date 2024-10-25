@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+# Find signals that are declared but never used
+
+use strict;
+use warnings;
+
+my %visited = ();
+my @lines;
+
+while(<>) {
+    my $line = $_;
+    push @lines, $line;
+    chomp($line);
+
+    if ($line =~ m/^\s*(wire|reg|logic)(\s+|\s*\[[^]]+\]\s*)(\w+)\b/) {
+        $visited{$3} = 0;
+    }
+    else {
+        for my $s (keys %visited) {
+            if ($line =~ m/\b$s\b/) {
+                $visited{$s} = 1;
+            }
+        }
+    }
+}
+
+for my $line (@lines) {
+    if ($line =~ m/^\s*(wire|reg|logic)(\s+|\s*\[[^]]+\]\s*)(\w+)\b/) {
+        if ($visited{$3} == 1) {
+            print $line;
+        }
+    }
+    else {
+        print $line;
+    }
+}

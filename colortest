@@ -1,0 +1,80 @@
+#!/usr/bin/env python3
+
+print("Attributes:")
+print("    \033[0m\033[0m00 REGULAR\033[0m")
+print("    \033[0m\033[1m01 BOLD\033[0m")
+print("    \033[0m\033[2m02 WEAK\033[0m")
+print("    \033[0m\033[3m03 ITALIC\033[0m")
+print("    \033[0m\033[4m04 UNDERLINE\033[0m")
+print("    \033[0m\033[5m05 SLOW BLINK\033[0m")
+print("    \033[0m\033[6m06 FAST BLINK\033[0m")
+print("    \033[0m\033[7m07 INVERSE\033[0m")
+print("    \033[0m\033[8m08 CONCEAL\033[0m")
+print("    \033[0m\033[9m09 STRIKETHROUGH\033[0m")
+print("    \033[0m\033[51m51 FRAMED\033[0m")
+print("    \033[0m\033[52m52 ENCIRCLED\033[0m")
+print("    \033[0m\033[53m53 ABOVELINE\033[0m")
+print("")
+
+print("4-Bit Color Test(Decimal):")
+print("    ", end="")
+for i in range(0, 8):
+    print(f"\033[0m\033[{30+i}m  {30+i:02d}  \033[0m", end="")
+print("")
+
+print("    ", end="")
+for i in range(0, 8):
+    print(f"\033[0m\033[{90+i}m  {90+i:02d}  \033[0m", end="")
+print("")
+
+print("    ", end="")
+for i in range(0, 8):
+    if i in [0, 1, 4, 5]:
+        print(f"\033[0m\033[{40+i}m  {40+i:02d}  \033[0m", end="")
+    else:
+        print(f"\033[0m\033[30;{40+i}m  {40+i:02d}  \033[0m", end="")
+print("")
+
+print("    ", end="")
+for i in range(0, 8):
+    if i in [0, 1, 4, 5]:
+        print(f"\033[0m\033[{100+i}m  {100+i:02X}  \033[0m", end="")
+    else:
+        print(f"\033[0m\033[30;{100+i}m  {100+i:02X}  \033[0m", end="")
+print("")
+print("")
+
+print("256-Colors Test(Hexical):")
+print(" 8-Color:")
+for i in range(0, 2):
+    print("    ", end="")
+    for j in range(0, 8):
+        if j in [0, 1, 4, 5]:
+            print(f"\033[0m\033[48;5;{i*8+j};38;5;7m  {i*8+j:02X}  \033[0m", end="")
+        else:
+            print(f"\033[0m\033[48;5;{i*8+j};38;5;0m  {i*8+j:02X}  \033[0m", end="")
+    print("")
+
+print(" RGB666:")
+for i in range(0, 6):
+    print("    ", end="")
+    for j in range(0, 6):
+        for k in range(0, 6):
+            c = i * 36 + j * 6 + k + 16
+            if j < 3:
+                print(f"\033[0m\033[48;5;{c}m{c:02X}\033[0m", end="")
+            else:
+                print(f"\033[0m\033[38;5;0;48;5;{c}m{c:02X}\033[0m", end="")
+        print(" ", end="")
+    print("")
+
+print(" Grayscale:")
+for i in range(0, 2):
+    print("    ", end="")
+    for j in range(0, 12):
+        c = i * 12 + j + 232
+        if i == 0:
+            print(f"\033[0m\033[48;5;{c}m {c:02X} \033[0m", end="")
+        else:
+            print(f"\033[0m\033[38;5;0;48;5;{c}m {c:02X} \033[0m", end="")
+    print("")
